@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Merci — Digit-aZ</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+      iframe {
+        width: 100%;
+        height: 100vh;
+        border: 0;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="merciFrame" src="/merci.html.html" title="Merci Digit-aZ" aria-label="Merci Digit-aZ"></iframe>
+    <script>
+      // Fill the "Merci {{contact.FIRSTNAME}}," placeholder from the query string.
+      const patchMerci = () => {
+        const iframe = document.getElementById('merciFrame');
+        if (!iframe) return;
+
+        const params = new URLSearchParams(window.location.search);
+        const firstname = params.get('prenom') || '';
+
+        try {
+          const doc = iframe.contentDocument;
+          if (!doc) return;
+
+          const span = doc.querySelector('.card-title span');
+          if (!span) return;
+
+          span.textContent = firstname;
+
+          // If no name provided, remove the comma text node right after the span (if present).
+          if (!firstname && span.nextSibling && span.nextSibling.nodeType === 3 /* TEXT_NODE */) {
+            span.nextSibling.textContent = '';
+          }
+        } catch (e) {
+          // Ignore; we'll just show the default placeholder.
+        }
+      };
+
+      const iframe = document.getElementById('merciFrame');
+      if (iframe) iframe.addEventListener('load', patchMerci);
+      patchMerci();
+    </script>
+  </body>
+</html>

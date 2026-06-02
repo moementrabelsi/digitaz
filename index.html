@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digit-aZ</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+      iframe {
+        width: 100%;
+        height: 100vh;
+        border: 0;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="siteFrame" src="/index.html.html" title="Digit-aZ" aria-label="Digit-aZ"></iframe>
+    <script>
+      // Patch the form submission so it works on Vercel static hosting (no Netlify form handler).
+      // We do it without editing your large HTML file by hooking into the iframe DOM.
+      const patch = () => {
+        const iframe = document.getElementById('siteFrame');
+        if (!iframe) return;
+
+        try {
+          const doc = iframe.contentDocument;
+          if (!doc) return;
+
+          const form = doc.querySelector('form[name="audit-seo"]');
+          if (!form) return;
+
+          form.setAttribute('method', 'GET');
+          form.setAttribute('action', '/merci.html');
+          form.removeAttribute('data-netlify');
+
+          // Avoid duplicate listeners if patch() runs more than once.
+          if (form.__digitazPatched) return;
+          form.__digitazPatched = true;
+
+          form.addEventListener('submit', function (ev) {
+            ev.preventDefault();
+            const fd = new FormData(form);
+            const prenom = fd.get('prenom') || '';
+            const params = new URLSearchParams();
+            if (prenom) params.set('prenom', prenom);
+
+            const qs = params.toString();
+            window.top.location.assign('/merci.html' + (qs ? '?' + qs : ''));
+          });
+        } catch (e) {
+          // If iframe access is blocked, fall back to the default behavior.
+        }
+      };
+
+      const iframe = document.getElementById('siteFrame');
+      if (iframe) iframe.addEventListener('load', patch);
+      patch();
+    </script>
+  </body>
+</html>
